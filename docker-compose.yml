@@ -1,18 +1,6 @@
 version: '3.8'
 
 services:
-  debug:
-    container_name: messaggio
-    build: 
-      context: .
-      dockerfile: Dockerfile.debug
-    ports:
-      - 8083:8080
-      - 50051:50051
-      - 4040:4000
-    depends_on:
-      - db
-      - kafka
 
   db:
     image: postgres:13
@@ -30,7 +18,7 @@ services:
     ports:
       - "9092:9092"
     environment:
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
