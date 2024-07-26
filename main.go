@@ -19,16 +19,17 @@ func main() {
 
 	cfg := config.LoadConfig()
 
-	if err := models.ConnectDatabase(cfg.PostgresDSN); err != nil {
+	if err := models.MustConnectToDatabase(cfg.PostgresDSN); err != nil {
 		log.Fatalf("Could not connect to the database: %v", err)
 	}
 
-	kafka.InitKafkaProducer(cfg.KafkaBroker)
-	kafka.InitKafkaConsumer(cfg.KafkaBroker)
+	kafka.NewKafkaProducer(cfg.KafkaBroker)
+	kafka.RunKafkaConsumer(cfg.KafkaBroker)
 
 	server := gin.Default()
 	server.POST("/messages", handlers.CreateMessage)
 	server.GET("/messages/processed", handlers.GetProcessedMessages)
+	server.GET("/messages/count", handlers.GetMessagesCount)
 	if err := server.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}

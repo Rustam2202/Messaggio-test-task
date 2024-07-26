@@ -11,7 +11,7 @@ import (
 
 var writer *kafka.Writer
 
-func InitKafkaProducer(broker string) {
+func NewKafkaProducer(broker string) {
 	writer = &kafka.Writer{
 		Addr:     kafka.TCP(broker),
 		Topic:    "messages",
