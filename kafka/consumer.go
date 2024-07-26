@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 
 	"github.com/Rustam2202/message-processor/config"
@@ -32,9 +33,12 @@ func InitKafkaConsumer(broker string) {
 				log.Println("could not read message from kafka:", err)
 				continue
 			}
+			var message models.Message
+			err = json.Unmarshal(msg.Value, &message)
+
 			log.Println("received message:", string(msg.Value))
 			// Mark message as processed in the database
-			tx := models.DB.Update("processed", true)
+			tx := models.DB.Model(&models.Message{}).Where("id = ?", message.ID).Update("processed", true)
 			if tx.Error != nil {
 				log.Println("could not update message in database:", tx.Error)
 			}

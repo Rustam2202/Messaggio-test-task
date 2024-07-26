@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 
 	"github.com/Rustam2202/message-processor/models"
@@ -18,13 +19,26 @@ func InitKafkaProducer(broker string) {
 	}
 }
 
+type messageReq struct {
+	ID      int    `json:"id"`
+	Content string `json:"content"`
+}
+
 func ProduceMessage(message models.Message) {
-	msg := kafka.Message{
-		Key:   []byte(string(message.ID)),
-		Value: []byte(message.Content),
+	var req messageReq = messageReq{
+		ID:      message.ID,
+		Content: message.Content,
+	}
+	messageBytes, err := json.Marshal(req)
+	if err != nil {
+		log.Println("could not marshal message:", err)
 	}
 
-	err := writer.WriteMessages(context.Background(), msg)
+	msg := kafka.Message{
+		Value: messageBytes,
+	}
+
+	err = writer.WriteMessages(context.Background(), msg)
 	if err != nil {
 		log.Println("could not write message to kafka:", err)
 	}
