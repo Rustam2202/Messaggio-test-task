@@ -1,10 +1,9 @@
 up:
-	make down
 	docker compose up --build -d
 down:
 	docker compose down
 
-zookeeper:
+run-zookeeper:
 	docker run -d --name zookeeper -p 2181:2181 wurstmeister/zookeeper
 run-kafka:
 	docker run -d --name kafka -p 9092:9092 --link zookeeper:zookeeper \
@@ -14,6 +13,19 @@ run-kafka:
     wurstmeister/kafka
 run-postgres:
 	docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password postgres
-
+	sleep 3
 	docker exec -it postgres psql -U postgres -c "CREATE DATABASE messages;"
 	docker exec -it postgres psql -U postgres -d messages -c "CREATE TABLE messages (id SERIAL PRIMARY KEY, content TEXT NOT NULL, created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP);"
+
+docker-build:
+	docker build -t message-processor .
+docker-run:
+	docker run -p 8080:8080 \
+	--name message-processor \
+	-e KAFKA_BROKER=kafka:9092 \
+	-e DB_HOST=postgres \
+	-e DB_PORT=5432 \
+	-e DB_USER="postgres" \
+	-e DB_PASSWORD="password" \
+	-e DB_NAME="messages" \
+	message-processor	

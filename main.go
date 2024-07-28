@@ -27,9 +27,10 @@ func main() {
 	kafka.RunKafkaConsumer(cfg.KafkaBroker)
 
 	server := gin.Default()
-	server.POST("/messages", handlers.CreateMessage)
-	server.GET("/messages/processed", handlers.GetProcessedMessages)
-	server.GET("/messages/count", handlers.GetMessagesCount)
+	api:=server.Group("/api")
+	api.POST("/messages", handlers.CreateMessage)
+	api.GET("/messages/processed", handlers.GetProcessedMessages)
+	api.GET("/messages/count", handlers.GetMessagesCount)
 	if err := server.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
