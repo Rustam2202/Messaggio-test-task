@@ -3,13 +3,13 @@ package kafka
 import (
 	"context"
 	"encoding/json"
-	"log"
 
+	"github.com/Rustam2202/message-processor/logger"
 	"github.com/Rustam2202/message-processor/models"
 	"github.com/segmentio/kafka-go"
 )
 
-func RunKafkaConsumer(broker string) {
+func RunConsumer(broker string) {
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:   []string{broker},
 		Topic:     "messages",
@@ -20,21 +20,22 @@ func RunKafkaConsumer(broker string) {
 		for {
 			msg, err := reader.ReadMessage(context.Background())
 			if err != nil {
-				log.Println("could not read message from kafka:", err)
+				logger.Logger.Error().Caller().Err(err).Msg("could not read message")
 				continue
 			}
 			var message models.Message
 			if err = json.Unmarshal(msg.Value, &message); err != nil {
-				log.Println("could not unmarshal message:", err)
+				logger.Logger.Error().Caller().Err(err).Msg("could not unmarshal message")
 				continue
 			}
 
 			tx := models.DB.Model(&models.Message{}).Where("id = ?", message.ID).Update("processed", true)
 			if tx.Error != nil {
-				log.Println("could not update message in database:", tx.Error)
+				logger.Logger.Error().Caller().Err(tx.Error).Msg("could not update message")
 				continue
 			}
 
+			logger.Logger.Debug().Msgf("Message ID:%d processed: %s", message.ID, message.Content)
 			reader.CommitMessages(context.Background(), msg)
 		}
 	}()

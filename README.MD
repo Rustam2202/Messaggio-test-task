@@ -23,6 +23,7 @@ dbname=messages
 port=5432 
 sslmode=disable
 KAFKA_BROKER=localhost:9092
+LOG_LEVEL=debug
 ```
 Use `makefile` commands:  
 `make up` for up docker compose container.  

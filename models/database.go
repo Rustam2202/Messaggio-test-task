@@ -3,15 +3,20 @@ package models
 import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/Rustam2202/message-processor/logger"
 )
 
 var DB *gorm.DB
 
-func MustConnectToDatabase(dsn string) error {
+func ConnectToDatabase(dsn string) {
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return err
+		logger.Logger.Fatal().Caller().Err(err).Msg("Failed to connect to database")
 	}
-	return DB.AutoMigrate(&Message{})
+	err = DB.AutoMigrate(&Message{})
+	if err != nil {
+		logger.Logger.Fatal().Caller().Err(err).Msg("Failed to auto migrate database")
+	}
 }

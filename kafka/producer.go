@@ -3,15 +3,15 @@ package kafka
 import (
 	"context"
 	"encoding/json"
-	"log"
 
+	"github.com/Rustam2202/message-processor/logger"
 	"github.com/Rustam2202/message-processor/models"
 	"github.com/segmentio/kafka-go"
 )
 
 var writer *kafka.Writer
 
-func NewKafkaProducer(broker string) {
+func NewProducer(broker string) {
 	writer = &kafka.Writer{
 		Addr:     kafka.TCP(broker),
 		Topic:    "messages",
@@ -31,7 +31,7 @@ func ProduceMessage(message models.Message) {
 	}
 	messageBytes, err := json.Marshal(req)
 	if err != nil {
-		log.Println("could not marshal message:", err)
+		logger.Logger.Error().Caller().Err(err).Msg("could not marshal message")
 	}
 
 	msg := kafka.Message{
@@ -40,6 +40,8 @@ func ProduceMessage(message models.Message) {
 
 	err = writer.WriteMessages(context.Background(), msg)
 	if err != nil {
-		log.Println("could not write message to kafka:", err)
+		logger.Logger.Error().Caller().Err(err).Msg("could not write message")
 	}
+
+	logger.Logger.Debug().Msg("Message produced")
 }
