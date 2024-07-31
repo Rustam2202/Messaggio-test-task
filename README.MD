@@ -1,13 +1,3 @@
-<!-- POSTGRES_DSN=host=db 
-user=user 
-password=password 
-dbname=messages 
-port=5432 
-sslmode=disable
-KAFKA_BROKER=kafka:9092
-# KAFKA_ADVERTISED_LISTENERS=localhost:9092 -->
-
-
 # Messaggio Messages Processer
 
 REST API server for store text messages in PostgreSQL database and using Apache Kafka for message processing.
@@ -16,18 +6,21 @@ REST API server for store text messages in PostgreSQL database and using Apache 
 ## Deployment
 Create .env file for set configs, for example:
 ```
-POSTGRES_DSN=host=db 
-user=user 
-password=password 
-dbname=messages 
-port=5432 
+SERVER_PORT=8080
+POSTGRES_DSN="host=db port=5432 user=user password=password dbname=messages sslmode=disable"
+DB_USER=user 
+DB_PASSWORD=password 
+DB_NAME=messages 
+DB_PORT=5432
 sslmode=disable
-KAFKA_BROKER=localhost:9092
+KAFKA_BROKER=kafka:9092
 LOG_LEVEL=debug
+#REMOTE_SERVER=ssh://user@url
 ```
 Use `makefile` commands:  
-`make up` for up docker compose container.  
-`make down` for shutdown and remove it.  
+- `make up` for up docker compose container.  
+- `make down` for shutdown and remove it.  
+- `make remote` up docker-compose container on remote server described in `REMOTE_SERVER` variable.
 
 ## API Endpoints
 

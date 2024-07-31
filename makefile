@@ -2,6 +2,8 @@ up:
 	docker compose up --build -d
 down:
 	docker compose down
+remote:
+	docker-compose -H "${REMOTE_SERVER}" up --build -d
 
 run-zookeeper:
 	docker run -d --name zookeeper -p 2181:2181 wurstmeister/zookeeper
